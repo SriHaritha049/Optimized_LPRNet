@@ -86,7 +86,8 @@ Optimization techniques:
 
 4. Performance Metrics Comparison
 
-![image](https://github.ncsu.edu/schalic/Optimized_LPRNet_CSC591/assets/30720/5ab26aaf-b58b-4561-a6bb-929f1d8190d9)
+
+![5ab26aaf-b58b-4561-a6bb-929f1d8190d9](https://github.com/user-attachments/assets/9e7d1d02-a116-4a61-9884-13fb6af4b95e)
 
 
 6. Conclusion
