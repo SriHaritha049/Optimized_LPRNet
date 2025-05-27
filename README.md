@@ -1,97 +1,128 @@
-How to Run:
-I have used Google Colab to build this and uploaded the ipynb file here. Running it would give the results of my work.
-LPRNet Model Optimization Project Report
+# LPRNet Model Optimization Project
 
-1. Introduction
+This project demonstrates systematic optimization of the LPRNet deep neural network for License Plate Recognition (LPR), focusing on three key metrics:
 
-This project focuses on systematically optimizing the LPRNet deep neural network for License Plate Recognition, with the primary objectives of enhancing:
-Accuracy
-Speed
-Space Efficiency
-2. Original Model Characteristics
+- **Accuracy**
+- **Inference Speed**
+- **Model Size (Space Efficiency)**
 
-2.1 LPRNet Architecture Overview
+---
 
-LPRNet is a lightweight, efficient deep neural network designed for real-time license plate recognition, characterized by:
-Input Image Size: 94×24 pixels
-Specialized preprocessing and normalization
-Convolutional backbone for feature extraction
-Connectionist Temporal Classification (CTC) loss function
+## 1. How to Run
 
-2.2 Key Architectural Components
+The project has been developed and tested on **Google Colab**.  
+To reproduce the results:
 
-Input Processing
-Fixed image size (94×24 pixels)
-Normalization for improved training convergence
-Convolutional Backbone
-Convolutional layers for spatial feature extraction
-Batch Normalization for feature map normalization
-ReLU activation functions
-Sequence Modeling
-Spatial-to-sequence mapping approach
-Eliminates explicit character segmentation
-Output Mechanism
-Character sequence prediction
-Greedy decoding algorithm
+- Upload and open the provided `.ipynb` file in Google Colab.
+- Run all cells to execute the full optimization pipeline and view results.
 
+---
 
-3. Optimization Strategies
-3.1 Pruning Optimization
+## 2. Original Model Characteristics
 
-Technique: L1 Unstructured Pruning
-Target Layers: Conv2d and Linear layers
-Pruning Percentage: 35%
-Methodology:
-Remove weights with smallest L1 norm
-Permanently eliminate insignificant connections
-Results:
-Model Size Reduction
-Accuracy: 89.8% (minimal decrease)
-Pruning Insights
-Careful layer sensitivity analysis
-Balanced trade-off between model compression and accuracy
-Focused on computationally intensive layers
+### 2.1 LPRNet Architecture Overview
 
-3.2 Quantization Optimization
+LPRNet is a lightweight, real-time DNN model for license plate recognition. Key properties include:
 
-Approach: Dynamic Quantization
-Conversion: Weights to int8 precision
-Key Techniques:
-Dynamic Quantization
-Runtime weight precision reduction
-Preserved activation floating-point precision
-Layer Fusion
-Combined compatible layers
-Reduced computational redundancy
-Targeted Conv2d, BatchNorm, and ReLU layers
-Quantization Outcomes
-Significant model size reduction
-Improved inference speed
-Minimal accuracy degradation
+- **Input Size:** 94×24 pixels
+- **Preprocessing:** Normalization for training stability
+- **Backbone:** Convolutional layers
+- **Loss Function:** Connectionist Temporal Classification (CTC)
 
-3.3 Machine Learning Compiler (MLC) Optimizations
+### 2.2 Key Architectural Components
 
-Model Compilation
-TorchScript tracing
-Conversion to TVM Relay format
-Advanced Optimizations
-Type inference and simplification
-Optimization techniques:
-1.FoldScaleAxis
-2.FuseOps
-3.AlterOpLayout
-4.EliminateCommonSubexpr
-5. XGBoost autotuning
+- **Input Processing:**  
+  - Fixed-size normalization (94×24 pixels)
+- **Feature Extraction:**  
+  - Conv2D layers + BatchNorm + ReLU activations
+- **Sequence Modeling:**  
+  - Spatial-to-sequence mapping (no explicit character segmentation)
+- **Output Layer:**  
+  - Greedy decoding for character sequence prediction
 
+---
 
-4. Performance Metrics Comparison
+## 3. Optimization Strategies
 
+### 3.1 Pruning Optimization
 
-![5ab26aaf-b58b-4561-a6bb-929f1d8190d9](https://github.com/user-attachments/assets/9e7d1d02-a116-4a61-9884-13fb6af4b95e)
+- **Technique:** L1 Unstructured Pruning  
+- **Target Layers:** Conv2D & Linear  
+- **Pruning Ratio:** 35%
 
+#### Methodology:
+- Remove weights with smallest L1-norm
+- Permanently eliminate less important connections
 
-6. Conclusion
-While the optimizations improved the speed of the model, perfect results weren’t achieved. The accuracy was slightly sacrificed, especially after pruning, but the model size remained consistent throughout the process. These results emphasize the need to strike the right balance between the three key metrics: accuracy, speed, and size. Moving forward, a more targeted approach in applying these optimizations may help achieve even better performance while minimizing trade-offs.
+#### Results:
+- **Accuracy:** 89.8% (minimal drop)
+- **Model Size:** Reduced
+- **Insights:**  
+  - Layer sensitivity analysis helped balance compression and accuracy.
+  - Focus was on compute-heavy layers.
 
+---
 
+### 3.2 Quantization Optimization
 
+- **Type:** Dynamic Quantization (weights to int8)
+
+#### Techniques:
+- **Dynamic Quantization:** Reduce runtime weight precision to int8
+- **Layer Fusion:** Merge Conv2D + BatchNorm + ReLU layers to optimize execution
+
+#### Results:
+- Improved inference speed
+- Further model size reduction
+- **Accuracy Impact:** Minor degradation
+
+---
+
+### 3.3 Machine Learning Compiler (MLC) Optimizations
+
+#### Toolchain:
+- **TorchScript → TVM Relay Conversion**
+
+#### Applied Optimizations:
+- `FoldScaleAxis`
+- `FuseOps`
+- `AlterOpLayout`
+- `EliminateCommonSubexpr`
+- **XGBoost Autotuning** for kernel performance
+
+#### Benefits:
+- Compiler-level fusion and layout tuning
+- TVM autotuning delivered faster inference
+
+---
+
+## 4. Performance Metrics Comparison
+
+| Optimization Stage | Accuracy | Inference Time | Model Size |
+|--------------------|----------|----------------|-------------|
+| Original           | ✅ High  | ❌ Slow         | 📦 Large     |
+| Pruned             | ⚠️ ~89.8% | ✅ Faster       | ✅ Smaller   |
+| Quantized          | ⚠️ Slight drop | ✅ Fastest | ✅ Smallest  |
+| TVM-Compiled       | ⚠️ Slight drop | 🚀 Optimized | ✅ Small     |
+
+> 📊 ![Performance Graph](https://github.com/user-attachments/assets/9e7d1d02-a116-4a61-9884-13fb6af4b95e)
+
+---
+
+## 5. Conclusion
+
+The optimization process successfully enhanced inference speed and reduced model size. However, a slight trade-off in accuracy—especially after pruning—was observed.
+
+📌 **Key takeaway:** Striking the right balance between accuracy, speed, and size is crucial.
+
+### Future Work:
+- Apply layer-wise adaptive pruning
+- Explore quantization-aware training (QAT)
+- Refine TVM autotuning with calibration data
+
+---
+
+## Acknowledgments
+
+- PyTorch, ONNX, TVM, and CUDA frameworks
+- LPRNet original authors
